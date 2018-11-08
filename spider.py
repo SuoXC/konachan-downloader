@@ -25,7 +25,7 @@ def download(image_url, to_dir):
 def get_pages(total_pages, to_dir):
     workers = 16
     url_mode = 'http://konachan.net/post?page=%s&tags='
-    xpath_large_images = "//a[@class='directlink largeimg']/@href"
+    xpath_images = "//a[@class='directlink largeimg' or @class='directlink smallimg']/@href"
     if not os.path.exists(to_dir):
         os.makedirs(to_dir)
 
@@ -39,7 +39,7 @@ def get_pages(total_pages, to_dir):
             print("WARNING: request page failed, page=%s, url=%s" % (page, page_url))
             continue
         tree = etree.HTML(html)
-        image_urls = tree.xpath(xpath_large_images)
+        image_urls = tree.xpath(xpath_images)
         print("image count of this page:", len(image_urls))
 
         with ThreadPoolExecutor(workers) as executor:
