@@ -22,14 +22,14 @@ def download(image_url, to_dir):
             print(e)
 
 
-def get_pages(total_pages, to_dir):
+def get_pages(from_page=1, to_page=10000, to_dir=None, search_keyword=''):
     workers = 16
-    url_mode = 'http://konachan.net/post?page=%s&tags='
+    url_mode = 'http://konachan.net/post?page=%s&tags=' + search_keyword
     xpath_images = "//a[@class='directlink largeimg' or @class='directlink smallimg']/@href"
     if not os.path.exists(to_dir):
         os.makedirs(to_dir)
 
-    for page in range(1, total_pages):
+    for page in range(from_page, to_page):
         time.sleep(1)
         page_url = url_mode % page
         print("view page:", page, page_url)
@@ -46,5 +46,16 @@ def get_pages(total_pages, to_dir):
             executor.map(download, image_urls, repeat(to_dir), timeout=100)
 
 
+def main():
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('--to_dir', required=True, help="saving dir")
+    parser.add_argument('--keyword', default='', type=str, help="search keyword")
+    parser.add_argument('--from_page', default=1, type=int, help="first page to download")
+    parser.add_argument('--to_page', default=10000, type=int, help="last page to download")
+    args = parser.parse_args()
+    get_pages(from_page=args.from_page, to_page=args.to_page, to_dir=args.to_dir, search_keyword=args.keyword)
+
+
 if __name__ == '__main__':
-    get_pages(total_pages=10000, to_dir='./images_download')
+    main()
